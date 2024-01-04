@@ -45,7 +45,7 @@ private static final LocalDate DATE_2 = LocalDate.parse("2023-11-20");
 private static final LocalDate DATE_3 = LocalDate.parse("2023-12-20");
 private static final LocalDate DATE_4 = LocalDate.parse("2024-01-01");
 
-Student[] students = {
+static Student[] students = {
 		new Student(ID_1, NAME_1, PHONE_1),
 		new Student(ID_2, NAME_2, PHONE_2),
 		new Student(ID_3, NAME_3, PHONE_3),
@@ -106,4 +106,8 @@ Mark[][] marks = {
 	 }
 	 return res;
  }
+public static Student getStudent(long id) {
+	// TODO Auto-generated method stub
+	return students[(int) (id-1)];
+}
 }
