@@ -3,6 +3,8 @@ package telran.students;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,11 +14,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import telran.exceptions.NotFoundException;
 import telran.students.dto.Mark;
+import telran.students.dto.Student;
 import telran.students.service.StudentsService;
 @SpringBootTest
 class StudentsServiceTests {
 	private static final String SERVICE_TEST = "Service: ";
-	private static final long WRONG_ID = 12345l;
+	private static final long TEST_ID = 12345l;
 	private static final String TEST_PHONE = "058-12345678";
 	private static final Mark markTest = new Mark(DbTestCreation.SUBJECT_1, LocalDate.parse("2024-01-05"), 50 );
 	
@@ -41,32 +44,67 @@ StudentsService studentsService;
 	@DisplayName(SERVICE_TEST + TestDisplayNames.GET_MARKS_NOT_FOUND)
 	void getMarksTestNotFoundTest() {
 		assertThrowsExactly(NotFoundException.class,
-				() -> studentsService.getMarks(WRONG_ID));
+				() -> studentsService.getMarks(TEST_ID));
 	}
+	
+	@Test
+	@DisplayName(SERVICE_TEST + TestDisplayNames.ADD_STUDENT_NORMAL)
+	void addStudentTest() {
+		Student studentExpected = new Student(TEST_ID, "Vasya", TEST_PHONE);
+		assertEquals(studentExpected, studentsService.addStudent(studentExpected));
+	}
+	
 	@Test
 	@DisplayName(SERVICE_TEST + TestDisplayNames.ADD_STUDENT_ALREADY_EXISTS)
 	void addStudentExistsStudentTest() {
 		assertThrowsExactly(IllegalStateException.class,
-				() -> studentsService.addStudent(DbTestCreation.getStudent(1)));
+				() -> studentsService.addStudent(dbCreation.getStudent(1)));
+	}
+	
+	@Test
+	@DisplayName(SERVICE_TEST + TestDisplayNames.UPDATE_PHONE_NORMAL)
+	void updatePhoneStudentTest() {
+		//new Student(ID_1, NAME_1, PHONE_1)
+		Student studentActual = studentsService.updatePhone(dbCreation.ID_1, TEST_PHONE);
+		assertEquals(TEST_PHONE, studentActual.phone());
 	}
 	
 	@Test
 	@DisplayName(SERVICE_TEST + TestDisplayNames.UPDATE_PHONE_NOT_FOUND)
 	void updatePhoneStudentNotFoundTest() {
 			assertThrowsExactly(NotFoundException.class,
-				()-> studentsService.updatePhone(WRONG_ID, TEST_PHONE));
+				()-> studentsService.updatePhone(TEST_ID, TEST_PHONE));
 	}
+	
+	@Test
+	@DisplayName(SERVICE_TEST + TestDisplayNames.ADD_MARK_NORMAL)
+	void addMarkTest() {
+		List<Mark> marksActual = studentsService.addMark(dbCreation.ID_1, markTest);
+		Mark[] marksExpected = dbCreation.getStudentMarks(1);
+		assertEquals(marksExpected.length+1, marksActual.size());
+		assertTrue(marksActual.contains(markTest));
+	}
+	
 	@Test
 	@DisplayName(SERVICE_TEST + TestDisplayNames.ADD_MARK_STUDENT_NOT_FOUND)
 	void addMarkNotFoundTest() {
 		assertThrowsExactly(NotFoundException.class,
-				() -> studentsService.addMark(WRONG_ID, markTest));
+				() -> studentsService.addMark(TEST_ID, markTest));
 	}
+	
+	@Test
+	@DisplayName(SERVICE_TEST + TestDisplayNames.REMOVE_STUDENT_NORMAL)
+	void removeStudentTest() {
+		Student removeStudentActual = studentsService.removeStudent(dbCreation.ID_1);
+		Student removeExpected = dbCreation.getStudent(dbCreation.ID_1);
+		assertEquals (removeStudentActual, removeExpected);
+	}
+	
 	@Test
 	@DisplayName(SERVICE_TEST + TestDisplayNames.REMOVE_STUDENT_NOT_FOUND)
 	void removeStudentNotFoundTest() {
 		assertThrowsExactly(NotFoundException.class,
-				()-> studentsService.removeStudent(WRONG_ID));
+				()-> studentsService.removeStudent(TEST_ID));
 	}
 	
 

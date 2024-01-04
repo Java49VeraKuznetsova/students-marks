@@ -106,8 +106,7 @@ Mark[][] marks = {
 	 }
 	 return res;
  }
-public static Student getStudent(long id) {
-	// TODO Auto-generated method stub
-	return students[(int) (id-1)];
+public Student getStudent(long id) {
+		return students[(int) (id-1)];
 }
 }
