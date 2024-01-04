@@ -1,0 +1,5 @@
+{"properties": [{
+  "name": "de.flapdoodle.mongodb.embedded.version",
+  "type": "java.lang.String",
+  "description": "A description for 'de.flapdoodle.mongodb.embedded.version'"
+}]}
