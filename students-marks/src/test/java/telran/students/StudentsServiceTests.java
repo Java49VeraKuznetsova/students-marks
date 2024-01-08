@@ -112,12 +112,41 @@ void getStudentsFewMarksTest() {
 }
 @Test
 void getGoodStudentsSubjectTest() {
-	//TODO
+	List<Student> actual = studentsService.getStudentsAllGoodMarksSubject(dbCreation.SUBJECT_4, 70);
+	List<Student> expected = List.of(dbCreation.getStudent(3), dbCreation.getStudent(4), dbCreation.getStudent(6));
+
+	assertIterableEquals(expected, actual);
+	
+	List<Student> actual2 = studentsService.getStudentsAllGoodMarksSubject(dbCreation.SUBJECT_1, 80);
+	List <Student> expected2 =
+			List.of(dbCreation.getStudent(1), dbCreation.getStudent(3), dbCreation.getStudent(6));
+
+	assertIterableEquals(expected2, actual2);
+	
+	List<Student> actual3 = studentsService.getStudentsAllGoodMarksSubject(dbCreation.SUBJECT_1, 90);
+	List <Student> expected3 =
+			List.of(dbCreation.getStudent(1),  dbCreation.getStudent(6));
+
+	assertIterableEquals(expected3, actual3);
+	
+	assertTrue(studentsService.getStudentsAllGoodMarksSubject(dbCreation.SUBJECT_1, 110).isEmpty());
+			
 	
 }
 @Test
 void getStudentsMarksAmountBetween() {
-	//TODO
+	
+	List<Student> actual = studentsService.getStudentsMarksAmountBetween(4, 5);
+	List<Student> expected = List.of(dbCreation.getStudent(6));
+	assertIterableEquals(expected, actual);
+	
+	List<Student> actual2 = studentsService.getStudentsMarksAmountBetween(1, 2);
+	List <Student> expected2 =
+			List.of(dbCreation.getStudent(2), dbCreation.getStudent(3), dbCreation.getStudent(5));
+	assertIterableEquals(expected2, actual2);
+	
+	assertTrue(studentsService.getStudentsMarksAmountBetween(5, 6).isEmpty());
+	
 }
 }
 	

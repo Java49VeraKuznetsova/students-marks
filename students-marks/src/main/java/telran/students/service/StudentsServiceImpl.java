@@ -127,18 +127,21 @@ final StudentRepo studentRepo;
 
 	@Override
 	public List<Student> getStudentsAllGoodMarksSubject(String subject, int thresholdScore) {
-		// TODO Auto-generated method stub
+	
 		//getting students who have at least one score of a given subject and all scores of that subject
 				//greater than or equal a given threshold
-		return null;
+		List<IdNamePhone> students = studentRepo.findByGoodMarksSubject(subject, thresholdScore);
+		
+		return getStudents(students);
 	}
 
 	@Override
 	public List<Student> getStudentsMarksAmountBetween(int min, int max) {
-		// TODO Auto-generated method stub
+		
 		//getting students having number of marks in a closed range of the given values
 		//nMarks >= min && nMarks <= max
-		return null;
+		List<IdNamePhone> students = studentRepo.findByBetweenMarks(min, max);
+		return getStudents(students);
 	}
 
 
