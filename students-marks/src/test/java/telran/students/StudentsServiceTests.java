@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.MongoTransactionManager;
 
 import telran.exceptions.NotFoundException;
 import telran.students.dto.Mark;
+import telran.students.dto.NameAvgScore;
 import telran.students.dto.Student;
 import telran.students.repo.StudentRepo;
 import telran.students.service.StudentsService;
@@ -131,12 +132,19 @@ void getStudentsMarksAmountBetween() {
 void getStudentSubjectMarks() {
 	List<Mark> expected = List.of(new Mark(DbTestCreation.SUBJECT_1, DbTestCreation.DATE_1, 80),
 			new Mark(DbTestCreation.SUBJECT_1, DbTestCreation.DATE_2, 90));
-  List<Mark> actual = studentsService.getStudentSubjectMarks(DbTestCreation.ID_1, DbTestCreation.SUBJECT_1);
-  assertTrue(studentsService.getStudentSubjectMarks(4, DbTestCreation.SUBJECT_1).isEmpty());
+  List<Mark> actual = studentsService.getStudentSubjectMarks(1, DbTestCreation.SUBJECT_1);
+  assertTrue(studentsService.getStudentSubjectMarks(DbTestCreation.ID_4, DbTestCreation.SUBJECT_1).isEmpty());
 
   assertThrowsExactly(NotFoundException.class, 
 () -> studentsService.getStudentSubjectMarks(1000, DbTestCreation.SUBJECT_1));
   assertIterableEquals(expected, actual);
+}
+@Test
+void getStudentAvgScoreGreater() {
+	List<NameAvgScore> expected = List.of(new NameAvgScore(DbTestCreation.NAME_6, 100),
+			new NameAvgScore(DbTestCreation.NAME_4, 93));
+	List<NameAvgScore> actual = studentsService.getStudentAvgScore(90);
+	assertIterableEquals(expected, actual);
 }
 /*
 @Test

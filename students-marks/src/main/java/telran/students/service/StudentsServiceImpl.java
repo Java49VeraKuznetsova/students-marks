@@ -1,10 +1,17 @@
 package telran.students.service;
 
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
 
+import org.bson.Document;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.*;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +20,7 @@ import telran.students.dto.IdName;
 import telran.students.dto.IdNamePhone;
 import telran.students.dto.Mark;
 import telran.students.dto.MarksOnly;
+import telran.students.dto.NameAvgScore;
 import telran.students.dto.Student;
 import telran.students.model.StudentDoc;
 import telran.students.repo.StudentRepo;
@@ -22,6 +30,8 @@ import telran.students.repo.StudentRepo;
 @RequiredArgsConstructor
 public class StudentsServiceImpl implements StudentsService {
 final StudentRepo studentRepo;
+final MongoTemplate mongoTemplate;
+
 
 	@Override
 	@Transactional
@@ -147,6 +157,7 @@ final StudentRepo studentRepo;
 	}
 
 	@Override
+	/*desicion 1
 	public List<Mark> getStudentSubjectMarks(long id, String subject) {
 		if(!studentRepo.existsById(id)) {
 			throw new NotFoundException(String.format("student with id %d not found", id));
@@ -165,7 +176,55 @@ final StudentRepo studentRepo;
 						.toList();
 			
 	}
+	*/
+	public List<Mark> getStudentSubjectMarks(long id, String subject) {
+		if(!studentRepo.existsById(id)) {
+			throw new NotFoundException(String.format("student with id %d not found", id));
+		}
+		MatchOperation matchStudent = Aggregation.match(Criteria.where("id").is(id));
+	    UnwindOperation unwindOperation = Aggregation.unwind("marks");
+        MatchOperation matchMarksSubject = Aggregation.match(Criteria.where("marks.subject").is(subject));
+        ProjectionOperation projectionOperation = Aggregation.project("marks.score", "marks.date");
+        Aggregation pipeLine = Aggregation.newAggregation(matchStudent, unwindOperation, matchMarksSubject, projectionOperation);
+        
+        var aggregationResult = mongoTemplate.aggregate(pipeLine, StudentDoc.class, Document.class);
+        List<Document> listDocuments = aggregationResult
+        		.getMappedResults();
+        log.debug("list Documents: {}", listDocuments);
+        List<Mark> result = listDocuments
+        		.stream()
+        		.map(d -> new Mark(subject, 
+        				d.getDate("date")
+        				.toInstant()
+        				.atZone(ZoneId.systemDefault())
+        				.toLocalDate(), 
+        				d.getInteger("score")))
+        		  		.toList();
+        log.debug("result: {}", result);
+        		
+        		return result;
+	}
 
-
-
+	@Override
+	public List<NameAvgScore> getStudentAvgScore(int avgScoreThreshold) {
+		UnwindOperation unwindOperation = Aggregation.unwind("marks");
+		GroupOperation groupOperation = Aggregation.group("name")
+				.avg("marks.score")
+				.as("avgMark");
+		MatchOperation matchOperation =Aggregation
+				.match(Criteria.where("avgMark").gt(avgScoreThreshold));
+		SortOperation sortOperation = Aggregation.sort(Direction.DESC, "avgMark");
+		Aggregation pipeLine = Aggregation.newAggregation(unwindOperation, groupOperation, matchOperation, sortOperation);
+		List<NameAvgScore> res = mongoTemplate
+				.aggregate(pipeLine, StudentDoc.class, Document.class)
+				.getMappedResults()
+				.stream()
+				.map(d -> new NameAvgScore(d.getString("_id"),
+						d.getDouble("avgMark").intValue()))
+				.toList();
+		log.debug("result: {}", res);
+		
+		
+		return res;
+	}
 }

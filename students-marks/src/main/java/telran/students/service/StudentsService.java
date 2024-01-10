@@ -25,4 +25,5 @@ List<Student> getStudentsAllGoodMarksSubject(String subject, int thresholdScore)
 List<Student> getStudentsMarksAmountBetween(int min, int max);
 //CW #75
 List<Mark> getStudentSubjectMarks(long id, String subject);
+List<NameAvgScore> getStudentAvgScore(int avgScoreThreshold);
 }
