@@ -29,14 +29,16 @@ public interface StudentRepo extends MongoRepository<StudentDoc, Long> {
 	
 	//getting students who have at least one score of a given subject and all scores of that subject
 	//greater than or equal a given threshold
-
-	@Query (value = "{$and: [{marks: {$elemMatch: {subject: {$eq:?0}}}}, {marks: {$elemMatch:{score: {$gte:?1}}}}]}")
+	@Query(value="{$and:[{marks: {$elemMatch:{subject: ?0,score:{$gte:?1}}}},"
+			+ " {marks: {$not:{$elemMatch:{subject: ?0,score:{$lt:?1}}}}}]}")
+	//@Query (value = "{$and: [{marks: {$elemMatch: {subject: {$eq:?0}}}}, {marks: {$elemMatch:{score: {$gte:?1}}}}]}")
 	List<IdNamePhone> findByGoodMarksSubject(String subject, int thresholdScore);
 	
 	
 	//getting students having number of marks in a closed range of the given values nMarks >= min && nMarks <= max
-	@Query (value = "{$expr: {$and:[{$gte:[{$size:$marks}, ?0]},{$lte:[{$size:$marks}, ?1]} ]}}")
-		List<IdNamePhone> findByBetweenMarks (int min, int max);
+	//@Query (value = "{$expr: {$and:[{$gte:[{$size:$marks}, ?0]},{$lte:[{$size:$marks}, ?1]} ]}}")
+	@Query(value="{$expr:{$and:[{$gte: [ { $size: $marks }, ?0 ] }, {$lte:[{$size:$marks},?1]}]}}")	
+	List<IdNamePhone> findByBetweenMarks (int min, int max);
 	
 	
 	
