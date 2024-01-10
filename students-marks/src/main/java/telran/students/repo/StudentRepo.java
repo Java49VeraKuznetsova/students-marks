@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.repository.Query;
 
 import telran.students.dto.IdName;
 import telran.students.dto.IdNamePhone;
+import telran.students.dto.MarksOnly;
 import telran.students.model.StudentDoc;
 
 public interface StudentRepo extends MongoRepository<StudentDoc, Long> {
@@ -40,7 +41,8 @@ public interface StudentRepo extends MongoRepository<StudentDoc, Long> {
 	@Query(value="{$expr:{$and:[{$gte: [ { $size: $marks }, ?0 ] }, {$lte:[{$size:$marks},?1]}]}}")	
 	List<IdNamePhone> findByBetweenMarks (int min, int max);
 	
-	
+	/******/
+	MarksOnly findByIdAndMarksSubject(long id, String subject);
 	
 	
 }

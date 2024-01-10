@@ -1,5 +1,6 @@
 package telran.students.service;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import telran.exceptions.NotFoundException;
 import telran.students.dto.IdName;
 import telran.students.dto.IdNamePhone;
 import telran.students.dto.Mark;
+import telran.students.dto.MarksOnly;
 import telran.students.dto.Student;
 import telran.students.model.StudentDoc;
 import telran.students.repo.StudentRepo;
@@ -142,6 +144,26 @@ final StudentRepo studentRepo;
 		//nMarks >= min && nMarks <= max
 		List<IdNamePhone> students = studentRepo.findByBetweenMarks(min, max);
 		return getStudents(students);
+	}
+
+	@Override
+	public List<Mark> getStudentSubjectMarks(long id, String subject) {
+		if(!studentRepo.existsById(id)) {
+			throw new NotFoundException(String.format("student with id %d not found", id));
+		}
+		MarksOnly marksOnly = studentRepo.findByIdAndMarksSubject(id, subject);
+		List<Mark> marks = Collections.emptyList();
+		if(marksOnly != null) {
+			marks = marksOnly.getMarks();
+			log.debug("student %d doesn't have marks of subject {}", id, subject );
+		}
+		
+		log.debug("marks: {}", marks);
+		return marks
+				.stream().filter(m ->m.subject()
+						.equals(subject))
+						.toList();
+			
 	}
 
 

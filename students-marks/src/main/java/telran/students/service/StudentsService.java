@@ -23,4 +23,6 @@ List<Student> getStudentsAllGoodMarksSubject(String subject, int thresholdScore)
 //getting students having number of marks in a closed range of the given values
 //nMarks >= min && nMarks <= max
 List<Student> getStudentsMarksAmountBetween(int min, int max);
+//CW #75
+List<Mark> getStudentSubjectMarks(long id, String subject);
 }
