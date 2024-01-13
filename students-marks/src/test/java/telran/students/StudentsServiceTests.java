@@ -146,46 +146,30 @@ void getStudentAvgScoreGreater() {
 	List<NameAvgScore> actual = studentsService.getStudentAvgScore(90);
 	assertIterableEquals(expected, actual);
 }
-/*
 @Test
-void getGoodStudentsSubjectTest() {
-	List<Student> actual = studentsService.getStudentsAllGoodMarksSubject(dbCreation.SUBJECT_4, 70);
-	List<Student> expected = List.of(dbCreation.getStudent(3), dbCreation.getStudent(4), dbCreation.getStudent(6));
-
+void getStudentMarksAtDatesTest() {
+	//
+	LocalDate from = LocalDate.parse("2023-10-21");
+	LocalDate to = LocalDate.parse("2023-12-20");
+	LocalDate to2 = LocalDate.parse("2023-11-19");
+	
+	List<Mark> expected = List.of(new Mark(DbTestCreation.SUBJECT_2, DbTestCreation.DATE_2, 100),
+			new Mark(DbTestCreation.SUBJECT_3, DbTestCreation.DATE_3, 100));
+	List<Mark> actual = studentsService.getStudentMarksAtDates(DbTestCreation.ID_6, from, to);
+	
+	assertThrowsExactly(NotFoundException.class, 
+	() -> studentsService.getStudentMarksAtDates(1000, from, to));
 	assertIterableEquals(expected, actual);
-	
-	List<Student> actual2 = studentsService.getStudentsAllGoodMarksSubject(dbCreation.SUBJECT_1, 80);
-	List <Student> expected2 =
-			List.of(dbCreation.getStudent(1), dbCreation.getStudent(3), dbCreation.getStudent(6));
-
-	assertIterableEquals(expected2, actual2);
-	
-	List<Student> actual3 = studentsService.getStudentsAllGoodMarksSubject(dbCreation.SUBJECT_1, 90);
-	List <Student> expected3 =
-			List.of(dbCreation.getStudent(1),  dbCreation.getStudent(6));
-
-	assertIterableEquals(expected3, actual3);
-	
-	assertTrue(studentsService.getStudentsAllGoodMarksSubject(dbCreation.SUBJECT_1, 110).isEmpty());
-			
-	
+	assertTrue(studentsService.getStudentMarksAtDates(DbTestCreation.ID_1, from, to2).isEmpty());
 }
 @Test
-void getStudentsMarksAmountBetween() {
-	
-	List<Student> actual = studentsService.getStudentsMarksAmountBetween(4, 5);
-	List<Student> expected = List.of(dbCreation.getStudent(6));
-	assertIterableEquals(expected, actual);
-	
-	List<Student> actual2 = studentsService.getStudentsMarksAmountBetween(1, 2);
-	List <Student> expected2 =
-			List.of(dbCreation.getStudent(2), dbCreation.getStudent(3), dbCreation.getStudent(5));
-	assertIterableEquals(expected2, actual2);
-	
-	assertTrue(studentsService.getStudentsMarksAmountBetween(5, 6).isEmpty());
-	
+void getBestStudentsTest() {
+	//TODO
 }
-*/
+@Test
+void getWorstStudentsTest() {
+	//TODO
+}
 }
 	
 	

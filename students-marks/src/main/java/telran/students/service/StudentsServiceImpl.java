@@ -1,6 +1,8 @@
 package telran.students.service;
 
+import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.List;
 
@@ -226,5 +228,65 @@ final MongoTemplate mongoTemplate;
 		
 		
 		return res;
+	}
+	@Override
+	public List<Mark> getStudentMarksAtDates(long id, LocalDate from, LocalDate to) {
+		// 
+		//returns list of Mark objects of the required student at the given dates
+		//Filtering and projection should be done at DB server
+		if (!studentRepo.existsById(id)) {
+			throw new NotFoundException(String.format("student with id %d not found", id));
+		}
+				
+		MatchOperation matchStudent = Aggregation.match(Criteria.where("id").is(id));
+		UnwindOperation unwindOperation = Aggregation.unwind("marks");
+		MatchOperation matchMarksDate1 = 
+	//?? and?
+				Aggregation.match(Criteria.where("marks.date").gte(from));	
+		MatchOperation matchMarksDate2 =
+				Aggregation.match(Criteria.where("marks.date").lte(to));
+        ProjectionOperation projectionOperation = Aggregation.project("marks.score", "marks.date", "marks.subject");
+        
+        Aggregation pipeLine = 
+        		Aggregation.newAggregation(matchStudent, unwindOperation, 
+        				matchMarksDate1, matchMarksDate2, projectionOperation);
+
+        var aggregationResult = mongoTemplate.aggregate(pipeLine, StudentDoc.class, Document.class);
+        List<Document> listDocuments = aggregationResult
+        		.getMappedResults();
+        log.debug("list Documents: {}", listDocuments);
+        List<Mark> result = listDocuments
+        		.stream()
+        		.map(d -> new Mark(d.getString("subject"), 
+        				d.getDate("date")
+        				.toInstant()
+        				.atZone(ZoneId.systemDefault())
+        				.toLocalDate(), 
+        				d.getInteger("score")))
+        		  		.toList();
+        log.debug("result: {}", result);
+        		
+        		return result;
+	}
+
+	
+
+	@Override
+	public List<String> getBestStudents(int nStudents) {
+		// TODO 
+		//returns list of a given number of the best students
+		//Best students are the ones who have most scores greater than 80
+		return null;
+	}
+
+	@Override
+	public List<String> getWorstStudents(int nStudents) {
+		// TODO 
+		//returns list of a given number of the worst students
+		//Worst students are the ones who have least sum's of all scores
+		//Students who have no scores at all should be considered as worst
+		//instead of GroupOperation to apply AggregationExpression (with AccumulatorOperators.Sum) 
+		//and ProjectionOperation for adding new fields with computed values 
+		return null;
 	}
 }
